@@ -8,15 +8,15 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 
 	. "github.com/j178/leetgo/testutils/go"
-	"golang.org/x/text/number"
 )
 
 // @lc code=begin
 
 func evalRPN(tokens []string) (ans int) {
-	mmaps := map[string]func(_, _ int) int{
+	mmaps := map[string]func(int, int) int{
 		"+": func(num1, num2 int) int {
 			return num1 + num2
 		},
@@ -31,16 +31,26 @@ func evalRPN(tokens []string) (ans int) {
 		},
 	}
 
-	stack := []string{}
+	stack := []int{}
 	for _, t := range tokens {
 		fn, ok := mmaps[t]
 		if !ok {
-			stack = append([]string{t}, stack...)
+			num, _ := strconv.Atoi(t)
+			stack = append(stack, num)
 		} else {
+			length := len(stack)
+			num2 := stack[length-1]
+			stack = stack[:length-1]
+
+			length = len(stack)
+			num1 := stack[length-1]
+			stack = stack[:length-1]
+
+			stack = append(stack, fn(num1, num2))
 		}
 	}
 
-	return
+	return stack[0]
 }
 
 // @lc code=end
